@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nursing College Admission Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="Fav-icon.png" type="image/x-icon">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #f72585;
+            --success-color: #4cc9f0;
+            --dark-color: #2b2d42;
+            --light-color: #f8f9fa;
+            --card-bg: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .chatbot-container {
+            width: 100%;
+            max-width: 450px;
+            height: 85vh;
+            background-color: white;
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .chatbot-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chatbot-header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+        }
+        
+        .chatbot-header img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            z-index: 1;
+            border: 2px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .chatbot-header-text {
+            z-index: 1;
+        }
+        
+        .chatbot-header h2 {
+            font-weight: 700;
+            font-size: 1.3rem;
+            margin-bottom: 3px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .chatbot-header p {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 8px;
+            background-color: rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
+        }
+        
+        .chatbot-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: var(--light-color);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background-image: url('https://transparenttextures.com/patterns/clean-gray-paper.png');
+        }
+        
+        .message {
+            max-width: 85%;
+            padding: 14px 18px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            animation: fadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .bot-message {
+            align-self: flex-start;
+            background-color: var(--card-bg);
+            color: var(--dark-color);
+            border-bottom-left-radius: 5px;
+        }
+        
+        .bot-message::before {
+            content: "";
+            position: absolute;
+            left: -8px;
+            top: 15px;
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-right: 8px solid var(--card-bg);
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .user-message::after {
+            content: "";
+            position: absolute;
+            right: -8px;
+            top: 15px;
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-left: 8px solid var(--secondary-color);
+        }
+        
+        .options-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            animation: fadeInOptions 0.5s ease-out;
+        }
+        
+        @keyframes fadeInOptions {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .option-btn {
+            background-color: white;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.1);
+        }
+        
+        .option-btn:hover {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.2);
+        }
+        
+        .option-btn:active {
+            transform: translateY(0);
+        }
+        
+        .chatbot-input {
+            display: flex;
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+        }
+        
+        .chatbot-input::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 5%;
+            width: 90%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,0,0,0.05), transparent);
+        }
+        
+        .chatbot-input input {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 30px;
+            outline: none;
+            font-size: 0.95rem;
+            background-color: #f5f7ff;
+            transition: all 0.3s ease;
+        }
+        
+        .chatbot-input input:focus {
+            background-color: #edf0ff;
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+        }
+        
+        .chatbot-input button {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-left: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .chatbot-input button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+        }
+        
+        .chatbot-input button:active {
+            transform: scale(0.98);
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 18px;
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            align-self: flex-start;
+            margin-bottom: 5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            width: fit-content;
+        }
+        
+        .typing-dot {
+            width: 9px;
+            height: 9px;
+            background-color: #a5b1fc;
+            border-radius: 50%;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typingAnimation {
+            0%, 60%, 100% { transform: translateY(0); background-color: #a5b1fc; }
+            30% { transform: translateY(-5px); background-color: var(--primary-color); }
+        }
+        
+        .info-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 18px;
+            margin-top: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--primary-color);
+            animation: fadeInCard 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        
+        @keyframes fadeInCard {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .info-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-card p {
+            font-size: 0.9rem;
+            color: var(--dark-color);
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .info-card ul {
+            padding-left: 22px;
+            font-size: 0.9rem;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .info-card li {
+            margin-bottom: 8px;
+            position: relative;
+        }
+        
+        .info-card li::before {
+            content: "•";
+            color: var(--primary-color);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+        
+        .highlight {
+            color: var(--primary-color);
+            font-weight: 600;
+            background-color: rgba(67, 97, 238, 0.1);
+            padding: 0 4px;
+            border-radius: 3px;
+        }
+        
+        .emoji {
+            font-size: 1.2rem;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .floating-icon {
+            position: absolute;
+            opacity: 0.05;
+            z-index: 0;
+        }
+        
+        .floating-icon:nth-child(1) {
+            top: 10%;
+            left: 5%;
+            font-size: 3rem;
+            animation: float 15s ease-in-out infinite;
+        }
+        
+        .floating-icon:nth-child(2) {
+            bottom: 15%;
+            right: 5%;
+            font-size: 4rem;
+            animation: float 18s ease-in-out infinite reverse;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+        
+        @media (max-width: 500px) {
+            .chatbot-container {
+                height: 90vh;
+                border-radius: 0;
+            }
+            
+            .message {
+                max-width: 90%;
+                padding: 12px 16px;
+            }
+            
+            .option-btn {
+                padding: 8px 14px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chatbot-container">
+        <div class="chatbot-header">
+            <i class="fas fa-graduation-cap floating-icon"></i>
+            <i class="fas fa-heartbeat floating-icon"></i>
+            <img src="https://cdn-icons-png.flaticon.com/512/2779/2779775.png" alt="LiaPlus AI">
+            <div class="chatbot-header-text">
+                <h2>Nursing Admission Bot <span class="status-badge">Live</span></h2>
+                <p>Your guide to B.Sc Nursing admissions</p>
+            </div>
+        </div>
+        
+        <div class="chatbot-messages" id="chatbot-messages">
+            <!-- Messages will appear here -->
+        </div>
+        
+        <div class="chatbot-input">
+            <input type="text" id="user-input" placeholder="Type a message or select options below..." autocomplete="off">
+            <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messagesContainer = document.getElementById('chatbot-messages');
+            const userInput = document.getElementById('user-input');
+            const sendBtn = document.getElementById('send-btn');
+            
+            // Enhanced conversation flow with all options
+            const conversation = [
+                {
+                    id: 'welcome',
+                    message: '<span class="emoji">👋</span> नमस्ते! क्या आप Nursing में अपना career शुरू करना चाहेंगे? हमारा <span class="highlight">B.Sc Nursing program</span> आपके सपनों को पंख लगाने के लिए तैयार है!',
+                    options: ['हाँ, जानकारी चाहिए', 'अभी नहीं, धन्यवाद'],
+                    responses: ['yes_interest', 'no_interest'],
+                    buttons: ['primary', 'secondary']
+                },
+                {
+                    id: 'no_interest',
+                    message: 'कोई बात नहीं! 😊 जब भी तैयार हों, हम यहीं मिलेंगे। Nursing career के बारे में यह वीडियो देखें: <a href="#" class="highlight">[लिंक]</a>',
+                    options: ['अभी जानकारी देखना चाहूँगा', 'बाद में देखूँगा'],
+                    responses: ['yes_interest', 'close_chat'],
+                    buttons: ['primary', 'secondary']
+                },
+                {
+                    id: 'close_chat',
+                    message: 'धन्यवाद! 🙏 आपके bright future की कामनाएँ! कभी भी हमसे संपर्क कर सकते हैं।',
+                    end: true
+                },
+                {
+                    id: 'yes_interest',
+                    message: '<span class="emoji">🎓</span> बेहतरीन चुनाव! क्या आपने <span class="highlight">12th grade में Biology</span> पढ़ी है? (यह admission के लिए जरूरी है)',
+                    options: ['हाँ, पढ़ी है', 'नहीं, नहीं पढ़ी', 'अन्य विषय पढ़ा है'],
+                    responses: ['has_biology', 'no_biology', 'other_subjects'],
+                    buttons: ['primary', 'danger', 'secondary']
+                },
+                {
+                    id: 'no_biology',
+                    message: '<span class="emoji">ℹ️</span> B.Sc Nursing में admission के लिए <span class="highlight">Biology अनिवार्य</span> है। आप 12th में Biology लेकर फिर apply कर सकते हैं!',
+                    options: ['Biology कहाँ से पढ़ सकते हैं?', 'अन्य courses के बारे में जानें', 'बाद में आऊँगा'],
+                    responses: ['biology_courses', 'other_courses', 'close_chat'],
+                    buttons: ['primary', 'secondary', 'secondary']
+                },
+                {
+                    id: 'other_subjects',
+                    message: '<span class="emoji">📚</span> क्या आपने Medical stream के अन्य subjects (Physics, Chemistry) पढ़े हैं?',
+                    options: ['हाँ, PCB पढ़ा है', 'नहीं, Arts/Commerce लिया था', 'वापस मेनू पर जाएँ'],
+                    responses: ['has_pcb', 'no_science', 'yes_interest'],
+                    buttons: ['primary', 'danger', 'secondary']
+                },
+                {
+                    id: 'has_biology',
+                    message: '<span class="emoji">✅</span> बहुत अच्छा! यह एक <span class="highlight">4-year, full-time degree program</span> है जिसमें आपको practical और theoretical दोनों तरह की training मिलेगी।',
+                    next: 'fee_structure'
+                },
+                {
+                    id: 'fee_structure',
+                    message: '<span class="emoji">💰</span> Program की fee structure इस प्रकार है:',
+                    html: `
+                        <div class="info-card">
+                            <h4><span class="emoji">📊</span> Annual Fees</h4>
+                            <ul>
+                                <li>Tuition Fee: <span class="highlight">₹60,000</span></li>
+                                <li>Bus Fee: <span class="highlight">₹10,000</span></li>
+                                <li><b>Total:</b> <span class="highlight">₹70,000</span> (3 installments में)</li>
+                            </ul>
+                            <h4><span class="emoji">💳</span> Installment Plan</h4>
+                            <ul>
+                                <li><b>1st Installment:</b> ₹30,000 (admission पर)</li>
+                                <li><b>2nd Installment:</b> ₹20,000 (1st semester के बाद)</li>
+                                <li><b>3rd Installment:</b> ₹20,000 (2nd semester के बाद)</li>
+                            </ul>
+                        </div>
+                    `,
+                    options: ['हॉस्टेल के बारे में जानें', 'सीधे admission process जानें', 'और जानकारी चाहिए'],
+                    responses: ['hostel_info', 'admission_process', 'more_info'],
+                    buttons: ['primary', 'success', 'secondary']
+                },
+                {
+                    id: 'hostel_info',
+                    message: '<span class="emoji">🏠</span> हमारी hostel facilities के बारे में जानें:',
+                    html: `
+                        <div class="info-card">
+                            <h4><span class="emoji">⭐</span> हॉस्टेल सुविधाएँ</h4>
+                            <ul>
+                                <li>24x7 पानी, बिजली, और Wi-Fi</li>
+                                <li>CCTV surveillance और महिला वार्डन</li>
+                                <li>शुद्ध vegetarian भोजन</li>
+                                <li>Common study rooms और library access</li>
+                            </ul>
+                            
+                            <h4><span class="emoji">🏥</span> प्रशिक्षण सुविधाएँ</h4>
+                            <ul>
+                                <li>Real-patient training at partnered hospitals</li>
+                                <li>ICU, OPD, और emergency ward में hands-on experience</li>
+                                <li>Modern simulation labs</li>
+                            </ul>
+                        </div>
+                    `,
+                    options: ['कॉलेज location देखें', 'Scholarship के बारे में जानें', 'वापस मेनू पर जाएँ'],
+                    responses: ['location_info', 'scholarship_info', 'fee_structure'],
+                    buttons: ['primary', 'success', 'secondary']
+                },
+                {
+                    id: 'location_info',
+                    message: '<span class="emoji">📍</span> हमारा कॉलेज <span class="highlight">Delhi के prime location</span> में स्थित है:',
+                    html: `
+                        <div class="info-card">
+                            <h4><span class="emoji">🚍</span> Connectivity</h4>
+                            <ul>
+                                <li>Nearest Metro Station: 500m</li>
+                                <li>Bus Stop: College gate के सामने</li>
+                                <li>Major landmarks से 15-20 minutes की दूरी पर</li>
+                            </ul>
+                            
+                            <h4><span class="emoji">🏙️</span> Nearby Facilities</h4>
+                            <ul>
+                                <li>Partner hospitals: 2km radius में</li>
+                                <li>Library और study cafes</li>
+                                <li>Students के लिए affordable housing options</li>
+                            </ul>
+                        </div>
+                    `,
+                    options: ['College accreditation जानें', 'Clinical training के बारे में जानें', 'वापस मेनू पर जाएँ'],
+                    responses: ['accreditation_info', 'clinical_info', 'hostel_info'],
+                    buttons: ['primary', 'success', 'secondary']
+                },
+                {
+                    id: 'accreditation_info',
+                    message: '<span class="emoji">🏛️</span> हम <span class="highlight">Indian Nursing Council (INC), Delhi</span> द्वारा मान्यता प्राप्त हैं:',
+                    html: `
+                        <div class="info-card">
+                            <h4><span class="emoji">✅</span> Key Benefits</h4>
+                            <ul>
+                                <li>Nationwide recognized degree</li>
+                                <li>International acceptance</li>
+                                <li>Eligibility for government jobs</li>
+                                <li>Quality education standards</li>
+                            </ul>
+                        </div>
+                    `,
+                    options: ['Scholarship options देखें', 'Admission process जानें', 'मुख्य मेनू पर वापस जाएँ'],
+                    responses: ['scholarship_info', 'admission_process', 'fee_structure'],
+                    buttons: ['primary', 'success', 'secondary']
+                },
+                {
+                    id: 'clinical_info',
+                    message: '<span class="emoji">🏥</span> आपको इन hospitals में practical training मिलेगी:',
+                    html: `
+                        <div class="info-card">
+                            <h4><span class="emoji">⭐</span> Clinical Training Locations</h4>
+                            <ul>
+                                <li><b>District Hospital, Backundpur</b> (General Medicine)</li>
+                                <li><b>Community Health Centers</b> (Rural Healthcare)</li>
+                                <li><b>Regional Hospital, Chartha</b> (Specialized Care)</li>
+                                <li><b>Ranchi Neurosurgery Hospital</b> (Advanced Training)</li>
+                            </ul>
+                            <p style="margin-top: 10px;">Total <span class="highlight">2000+ hours</span> of hands-on training!</p>
+                        </div>
+                    `,
+                    options: ['Scholarship के बारे में जानें', 'Seats की availability जानें', 'मुख्य मेनू पर वापस जाएँ'],
+                    responses: ['scholarship_info', 'seats_info', 'fee_structure'],
+                    buttons: ['primary', 'success', 'secondary']
+                },
+                {
+                    id: 'scholarship_info',
+                    message: '<span class="emoji">🎓</span> हमारे scholarship programs के बारे में जानें:',
+                    html: `
+                        <div class="info-card">
+                            <h4><span class="emoji">💰</span> Available Scholarships</h4>
+                            <ul>
+                                <li><b>Government Post-Matric Scholarship:</b> ₹18,000–₹23,000 (SC/ST/OBC students)</li>
+                                <li><b>Labour Ministry Scholarship:</b> ₹40,000–₹48,000 (Labour card holders)</li>
+                                <li><b>Merit Scholarship:</b> Up to 50% fee waiver (Top 10 rankers)</li>
+                            </ul>
+                            <p style="margin-top: 10px;"><span class="emoji">ℹ️</span> <i>85% students receive some form of financial aid</i></p>
+                        </div>
+                    `,
+                    options: ['Eligibility criteria जानें', 'How to apply for scholarships?', 'मुख्य मेनू पर वापस जाएँ'],
+                    responses: ['eligibility_info', 'scholarship_apply', 'fee_structure'],
+                    buttons: ['primary', 'success', 'secondary']
+                },
+                {
+                    id: 'seats_info',
+                    message: '<span class="emoji">🪑</span> प्रति वर्ष <span class="highlight">कुल 60 सीटें</span> उपलब्ध हैं:',
+                    html: `
+                        <div class="info-card">
+                            <h4><span class="emoji">📊</span> Seat Distribution</h4>
+                            <ul>
+                                <li>General Category: 25 seats</li>
+                                <li>SC/ST: 15 seats</li>
+                                <li>OBC: 12 seats</li>
+                                <li>Management Quota: 8 seats</li>
+                            </ul>
+                            <p style="margin-top: 10px;">Admission <span class="highlight">merit + PNT exam score</span> के आधार पर होता है</p>
+                        </div>
+                    `,
+                    options: ['Eligibility criteria जानें', 'Admission process देखें', 'मुख्य मेनू पर वापस जाएँ'],
+                    responses: ['eligibility_info', 'admission_process', 'fee_structure'],
+                    buttons: ['primary', 'success', 'secondary']
+                },
+                {
+                    id: 'eligibility_info',
+                    message: '<span class="emoji">📝</span> Admission के लिए पात्रता:',
+                    html: `
+                        <div class="info-card">
+                            <h4><span class="emoji">✅</span> Requirements</h4>
+                            <ul>
+                                <li><b>Academic:</b> 12th grade with Biology (Minimum 50% marks)</li>
+                                <li><b>Entrance:</b> PNT Exam (Passing mandatory)</li>
+                                <li><b>Age:</b> 17–35 years (as on admission date)</li>
+                                <li><b>Medical Fitness:</b> Certificate required</li>
+                            </ul>
+                        </div>
+                    `,
+                    options: ['Admission process जानें', 'Important dates देखें', 'Apply now करें'],
+                    responses: ['admission_process', 'important_dates', 'apply_now'],
+                    buttons: ['primary', 'success', 'accent']
+                },
+                {
+                    id: 'admission_process',
+                    message: '<span class="emoji">📋</span> Admission process के steps:',
+                    html: `
+                        <div class="info-card">
+                            <h4><span class="emoji">🔹</span> Step-by-Step Process</h4>
+                            <ul>
+                                <li><b>Step 1:</b> Online application form भरें</li>
+                                <li><b>Step 2:</b> PNT exam के लिए register करें</li>
+                                <li><b>Step 3:</b> Entrance exam दें</li>
+                                <li><b>Step 4:</b> Merit list की जाँच करें</li>
+                                <li><b>Step 5:</b> Document verification और fee payment</li>
+                                <li><b>Step 6:</b> Orientation program attend करें</li>
+                            </ul>
+                        </div>
+                    `,
+                    options: ['Important dates देखें', 'Apply now करें', 'मुख्य मेनू पर वापस जाएँ'],
+                    responses: ['important_dates', 'apply_now', 'fee_structure'],
+                    buttons: ['primary', 'accent', 'secondary']
+                },
+                {
+                    id: 'important_dates',
+                    message: '<span class="emoji">📅</span> आगामी important dates:',
+                    html: `
+                        <div class="info-card">
+                            <h4><span class="emoji">🗓️</span> Academic Year 2023-24</h4>
+                            <ul>
+                                <li><b>Application Start:</b> 1st June 2023</li>
+                                <li><b>Last Date:</b> 30th June 2023</li>
+                                <li><b>PNT Exam:</b> 15th July 2023</li>
+                                <li><b>Result Declaration:</b> 25th July 2023</li>
+                                <li><b>Admission Start:</b> 1st August 2023</li>
+                            </ul>
+                        </div>
+                    `,
+                    options: ['Apply now करें', 'Reminder set करें', 'और जानकारी चाहिए'],
+                    responses: ['apply_now', 'set_reminder', 'more_info'],
+                    buttons: ['accent', 'primary', 'secondary']
+                },
+                {
+                    id: 'apply_now',
+                    message: '<span class="emoji">🚀</span> Fantastic! आपके Nursing career की शुरुआत होने वाली है!',
+                    html: `
+                        <div class="info-card">
+                            <h4><span class="emoji">🔗</span> Next Steps</h4>
+                            <ul>
+                                <li>Application form के लिए: <a href="#" class="highlight">यहाँ क्लिक करें</a></li>
+                                <li>Helpline number: <span class="highlight">98765XXXXX</span></li>
+                                <li>Email us: <span class="highlight">admissions@nursingcollege.edu</span></li>
+                            </ul>
+                            <p style="margin-top: 15px;">हमारी counselor आपसे <span class="highlight">24 घंटे</span> में संपर्क करेगी!</p>
+                        </div>
+                    `,
+                    end: true
+                },
+                {
+                    id: 'set_reminder',
+                    message: '<span class="emoji">⏰</span> Reminder set! हम आपको important dates की याद दिलाएँगे:',
+                    html: `
+                        <div class="info-card">
+                            <h4><span class="emoji">📩</span> You'll receive:</h4>
+                            <ul>
+                                <li>Application deadline alerts</li>
+                                <li>Exam date reminders</li>
+                                <li>Admission updates</li>
+                                <li>Scholarship notifications</li>
+                            </ul>
+                            <p style="margin-top: 15px;">Check your email/spam folder for confirmation!</p>
+                        </div>
+                    `,
+                    options: ['Apply now करें', 'और जानकारी चाहिए', 'चैट समाप्त करें'],
+                    responses: ['apply_now', 'more_info', 'close_chat'],
+                    buttons: ['accent', 'primary', 'secondary']
+                },
+                {
+                    id: 'more_info',
+                    message: '<span class="emoji">📚</span> और कौन सी जानकारी चाहिए?',
+                    options: ['Fee structure', 'Hostel facilities', 'Scholarships', 'Admission process', 'Contact details'],
+                    responses: ['fee_structure', 'hostel_info', 'scholarship_info', 'admission_process', 'contact_info'],
+                    buttons: ['primary', 'primary', 'primary', 'primary', 'primary']
+                },
+                {
+                    id: 'contact_info',
+                    message: '<span class="emoji">📞</span> हमसे संपर्क करें:',
+                    html: `
+                        <div class="info-card">
+                            <h4><span class="emoji">🏫</span> College Address</h4>
+                            <p>123 Nursing College Road, Delhi - 1100XX</p>
+                            
+                            <h4><span class="emoji">☎️</span> Contact Details</h4>
+                            <ul>
+                                <li>Admission Helpline: <span class="highlight">98765XXXXX</span></li>
+                                <li>Email: <span class="highlight">admissions@nursingcollege.edu</span></li>
+                                <li>Website: <span class="highlight">www.nursingcollege.edu</span></li>
+                            </ul>
+                            
+                            <h4><span class="emoji">🕒</span> Office Hours</h4>
+                            <p>Monday-Saturday: 9AM - 5PM</p>
+                        </div>
+                    `,
+                    options: ['Apply now करें', 'Website visit करें', 'चैट समाप्त करें'],
+                    responses: ['apply_now', 'visit_website', 'close_chat'],
+                    buttons: ['accent', 'primary', 'secondary']
+                }
+            ];
+            
+            let currentState = 'welcome';
+            
+            // Initialize chat after slight delay
+            setTimeout(() => {
+                showBotMessage(getMessageById(currentState));
+            }, 1200);
+            
+            // Send button click handler
+            sendBtn.addEventListener('click', sendMessage);
+            
+            // Enter key handler
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            function sendMessage() {
+                const message = userInput.value.trim();
+                if (message === '') return;
+                
+                showUserMessage(message);
+                userInput.value = '';
+                
+                // Simulate bot thinking
+                setTimeout(() => {
+                    processUserResponse(message);
+                }, 800);
+            }
+            
+            function showUserMessage(message) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', 'user-message');
+                messageElement.textContent = message;
+                messagesContainer.appendChild(messageElement);
+                scrollToBottom();
+            }
+            
+            function showBotMessage(messageObj) {
+                // Show typing indicator
+                const typingIndicator = document.createElement('div');
+                typingIndicator.classList.add('typing-indicator');
+                typingIndicator.innerHTML = `
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                `;
+                messagesContainer.appendChild(typingIndicator);
+                scrollToBottom();
+                
+                // Remove typing indicator after delay and show message
+                setTimeout(() => {
+                    messagesContainer.removeChild(typingIndicator);
+                    
+                    const messageElement = document.createElement('div');
+                    messageElement.classList.add('message', 'bot-message');
+                    
+                    if (messageObj.html) {
+                        messageElement.innerHTML = messageObj.message + messageObj.html;
+                    } else {
+                        messageElement.innerHTML = messageObj.message;
+                    }
+                    
+                    messagesContainer.appendChild(messageElement);
+                    
+                    // Add options if available
+                    if (messageObj.options && messageObj.options.length > 0) {
+                        const optionsContainer = document.createElement('div');
+                        optionsContainer.classList.add('options-container');
+                        
+                        messageObj.options.forEach((option, index) => {
+                            const optionBtn = document.createElement('div');
+                            optionBtn.classList.add('option-btn');
+                            
+                            // Add button style class if specified
+                            if (messageObj.buttons && messageObj.buttons[index]) {
+                                optionBtn.classList.add(messageObj.buttons[index] + '-btn');
+                            }
+                            
+                            optionBtn.textContent = option;
+                            optionBtn.addEventListener('click', () => {
+                                showUserMessage(option);
+                                processOptionSelection(messageObj.responses[index]);
+                            });
+                            optionsContainer.appendChild(optionBtn);
+                        });
+                        
+                        messagesContainer.appendChild(optionsContainer);
+                    }
+                    
+                    scrollToBottom();
+                    
+                    // Auto-scroll after options appear
+                    setTimeout(scrollToBottom, 100);
+                }, 1500);
+            }
+            
+            function processUserResponse(message) {
+                // In a real implementation, you'd use NLP to understand the message
+                // For this demo, we'll just continue the conversation flow
+                const currentMessage = getMessageById(currentState);
+                
+                if (currentMessage.next) {
+                    currentState = currentMessage.next;
+                    showBotMessage(getMessageById(currentState));
+                } else if (currentMessage.end) {
+                    showClosingMessage();
+                }
+            }
+            
+            function processOptionSelection(responseId) {
+                currentState = responseId;
+                const nextMessage = getMessageById(currentState);
+                
+                if (nextMessage.end) {
+                    showClosingMessage();
+                } else {
+                    showBotMessage(nextMessage);
+                }
+            }
+            
+            function showClosingMessage() {
+                const closingMessages = [
+                    "Remember: The world needs more superheroes like you in scrubs! 🦸‍♀️🩺",
+                    "आपके bright future की कामनाएँ! ✨ हमेशा आपकी help के लिए तैयार हैं।",
+                    "Nursing एक सम्मानजनक पेशा है - आपका योगदान अमूल्य होगा! 🙏",
+                    "हमें उम्मीद है कि यह जानकारी helpful रही होगी! कभी भी संपर्क करें।"
+                ];
+                
+                const randomMessage = closingMessages[Math.floor(Math.random() * closingMessages.length)];
+                
+                showBotMessage({
+                    message: randomMessage,
+                    end: true
+                });
+            }
+            
+            function getMessageById(id) {
+                return conversation.find(item => item.id === id);
+            }
+            
+            function scrollToBottom() {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        });
+    </script>
+</body>
+</html>
